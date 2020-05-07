@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Learning words
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>Para patatina</div>
       </q-toolbar>
     </q-header>
 
@@ -26,32 +26,19 @@
       content-class="bg-grey-2"
     >
       <q-list>
-        <q-item-label header>Essential Links</q-item-label>
-        <q-item clickable @click="$router.push({ name: 'Home' })">
+        <q-item-label header>Navigation</q-item-label>
+        <q-item
+          v-for="item in navigationItems"
+          :key="item.toRouteName"
+          clickable
+          @click="navigateTo(item.toRouteName)"
+        >
           <q-item-section avatar>
-            <q-icon name="school" />
+            <q-icon :name="item.icon" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Home</q-item-label>
-            <q-item-label caption>Cards List</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="$router.push({ name: 'AddCard' })">
-          <q-item-section avatar>
-            <q-icon name="code" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>AddCard</q-item-label>
-            <q-item-label caption>Add more cards</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="$router.push({ name: 'Tags' })">
-          <q-item-section avatar>
-            <q-icon name="chat" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Tags</q-item-label>
-            <q-item-label caption>manage your tags</q-item-label>
+            <q-item-label>{{ item.label }}</q-item-label>
+            <q-item-label caption>{{ item.caption }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -69,8 +56,37 @@ export default {
 
   data() {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      navigationItems: [
+        {
+          icon: "school",
+          label: "Home",
+          caption: "Cards List",
+          toRouteName: "Home"
+        },
+        {
+          icon: "code",
+          label: "AddCard",
+          caption: "Add more cards",
+          toRouteName: "AddCard"
+        },
+        {
+          icon: "chat",
+          label: "Tags",
+          caption: "Manage your tags",
+          toRouteName: "Tags"
+        }
+      ]
     };
+  },
+  methods: {
+    navigateTo(routeName) {
+      if (this.$route.name !== routeName)
+        this.$router.push({ name: routeName });
+      else {
+        this.leftDrawerOpen = false;
+      }
+    }
   }
 };
 </script>
