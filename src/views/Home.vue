@@ -1,38 +1,42 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md home">
-    <div
-      class="card"
-      @click="isFrontSide = !isFrontSide"
-      :class="{ 'card-back_side': !isFrontSide }"
-    >
-      <div class="card__inner">
-        <q-card class="card__side card__front">
-          <q-card-section>
-            <h2>{{ currentCard.word }}</h2>
-          </q-card-section>
-        </q-card>
-        <q-card class="card__side card__back">
-          <q-card-section>
-            <div class="card__back__word">{{ currentCard.word }}:</div>
-            <div class="card__back__translation">
-              {{ currentCard.translation }}
-            </div>
-            <div class="card__back__notes-label">NOTES:</div>
-            <div class="card__back__notes">{{ currentCard.notes }}</div>
-            <div class="card__back__tags">
-              <q-chip
-                outline
-                color="teal"
-                text-color="white"
-                v-for="tag in currentCard.tags"
-                :key="tag"
-                >{{ tag }}</q-chip
-              >
-            </div>
-          </q-card-section>
-        </q-card>
+    <transition name="fade">
+      <div
+        class="card"
+        @click="isFrontSide = !isFrontSide"
+        :class="{ 'card-back_side': !isFrontSide }"
+        v-touch-swipe.mouse.right.left="handleSwipe"
+        v-show="!this.isTransitioning"
+      >
+        <div class="card__inner">
+          <q-card class="card__side card__front">
+            <q-card-section>
+              <h2>{{ currentCard.word }}</h2>
+            </q-card-section>
+          </q-card>
+          <q-card class="card__side card__back">
+            <q-card-section>
+              <div class="card__back__word">{{ currentCard.word }}:</div>
+              <div class="card__back__translation">
+                {{ currentCard.translation }}
+              </div>
+              <div class="card__back__notes-label">NOTES:</div>
+              <div class="card__back__notes">{{ currentCard.notes }}</div>
+              <div class="card__back__tags">
+                <q-chip
+                  outline
+                  color="teal"
+                  text-color="white"
+                  v-for="tag in currentCard.tags"
+                  :key="tag"
+                  >{{ tag }}</q-chip
+                >
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -73,12 +77,30 @@ export default {
         }
       ],
       currentIndex: 3,
-      isFrontSide: false
+      isFrontSide: true,
+      isTransitioning: false
     };
   },
   computed: {
     currentCard() {
       return this.cards[this.currentIndex];
+    }
+  },
+  methods: {
+    handleSwipe({ direction }) {
+      this.isTransitioning = true;
+      const vm = this;
+      setTimeout(function() {
+        vm.isFrontSide = true;
+        if (direction === "rigth") {
+          vm.currentIndex = vm.currentIndex
+            ? vm.cards.length - 1
+            : vm.currentIndex - 1;
+        } else {
+          vm.currentIndex = (vm.currentIndex + 1) % vm.cards.length;
+        }
+        vm.isTransitioning = false;
+      }, 300);
     }
   }
 };
@@ -99,13 +121,14 @@ export default {
   margin-top: 5rem;
   width: 30rem;
   height: 20rem;
+  user-select: none;
 
   &__inner {
     position: relative;
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.8s;
+    transition: transform 0.4s;
     transform-style: preserve-3d;
   }
 
@@ -158,5 +181,12 @@ export default {
       bottom: 1rem;
     }
   }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
