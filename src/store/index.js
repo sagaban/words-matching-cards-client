@@ -60,6 +60,17 @@ export default new Vuex.Store({
           errorHandler("There was a problem saving new tag", error);
         });
     },
+    fetchCards({ commit }) {
+      Loading.show();
+      return CardService.getCards()
+        .then(response => {
+          commit("SET_CARDS", response.data);
+        })
+        .catch(error => {
+          errorHandler("There was a problem fetching cards", error);
+        })
+        .finally(() => Loading.hide());
+    },
     saveNewCard({ commit }, newCard) {
       Loading.show();
       return CardService.postCard(newCard)
@@ -79,6 +90,9 @@ export default new Vuex.Store({
   getters: {
     tagsArray: state => {
       return Object.keys(state.tags).map(key => state.tags[key]);
+    },
+    cardsArray: state => {
+      return Object.keys(state.cards).map(key => state.cards[key]);
     }
   }
 });

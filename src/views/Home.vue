@@ -28,8 +28,8 @@
                   color="teal"
                   text-color="white"
                   v-for="tag in currentCard.tags"
-                  :key="tag"
-                  >{{ tag }}</q-chip
+                  :key="tag.id"
+                  >{{ tags[tag.id].name }}</q-chip
                 >
               </div>
             </q-card-section>
@@ -41,49 +41,33 @@
 </template>
 
 <script>
+import store from "@/store";
+
 export default {
   name: "Home",
+  async beforeRouteEnter(routeTo, routeFrom, next) {
+    await Promise.all([
+      store.dispatch("fetchTags"),
+      store.dispatch("fetchCards")
+    ]);
+    next();
+  },
   data() {
     return {
-      cards: [
-        {
-          id: 1,
-          word: "home",
-          translation: "hogar",
-          notes: "Where people live",
-          tags: ["building"]
-        },
-        {
-          id: 2,
-          word: "dog",
-          translation: "perro",
-          notes: "My setellites",
-          tags: ["animals"]
-        },
-        {
-          id: 3,
-          word: "orange",
-          translation: "naranja",
-          notes: "",
-          tags: ["fruits", "food"]
-        },
-        {
-          id: 4,
-          word: "congratulations",
-          translation: "felicitaciones",
-          notes:
-            "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim",
-          tags: ["talk"]
-        }
-      ],
-      currentIndex: 3,
+      currentIndex: 0,
       isFrontSide: true,
       isTransitioning: false
     };
   },
   computed: {
     currentCard() {
-      return this.cards[this.currentIndex];
+      return this.cardsArray[this.currentIndex];
+    },
+    cardsArray() {
+      return this.$store.getters.cardsArray;
+    },
+    tags() {
+      return this.$store.state.tags;
     }
   },
   methods: {
@@ -94,10 +78,10 @@ export default {
         vm.isFrontSide = true;
         if (direction === "rigth") {
           vm.currentIndex = vm.currentIndex
-            ? vm.cards.length - 1
+            ? vm.cardsArray.length - 1
             : vm.currentIndex - 1;
         } else {
-          vm.currentIndex = (vm.currentIndex + 1) % vm.cards.length;
+          vm.currentIndex = (vm.currentIndex + 1) % vm.cardsArray.length;
         }
         vm.isTransitioning = false;
       }, 300);
