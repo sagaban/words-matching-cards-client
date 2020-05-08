@@ -1,7 +1,12 @@
 <template>
   <div class="q-pa-md add-card">
     <h4>Add a new word</h4>
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <q-form
+      @submit="onSubmit"
+      @reset="onReset"
+      ref="cardForm"
+      class="q-gutter-md"
+    >
       <q-input
         filled
         v-model="word"
@@ -70,23 +75,24 @@ export default {
   },
   computed: {
     tagsArray() {
-      return this.$store.getters.tagsArray.map(tag => tag.name);
+      return this.$store.getters.tagsArray;
+    },
+    tagsStringArray() {
+      return this.tagsArray.map(tag => tag.name);
     }
   },
   methods: {
     tagFilter(val, update) {
-      this.$q.notify("Message");
-
       if (val === "") {
         update(() => {
-          this.filteredOptions = this.tagsArray;
+          this.filteredOptions = this.tagsStringArray;
         });
         return;
       }
       update(() => {
-        if (this.tagsArray && this.tagsArray.length) {
+        if (this.tagsStringArray && this.tagsStringArray.length) {
           const needle = val.toLowerCase();
-          this.filteredOptions = this.tagsArray.filter(v =>
+          this.filteredOptions = this.tagsStringArray.filter(v =>
             v.toLowerCase().includes(needle)
           );
         }
@@ -101,7 +107,7 @@ export default {
           .map(v => v.trim())
           .filter(v => v.length > 0)
           .forEach(v => {
-            if (!this.tagsArray.includes(v)) {
+            if (!this.tagsStringArray.includes(v)) {
               this.$store.dispatch("saveNewTag", { name: v });
             }
             if (!tags.includes(v)) {
@@ -113,13 +119,36 @@ export default {
         this.tags = tags;
       }
     },
-    onSubmit() {},
+    async onSubmit() {
+      if (this.word && this.translation) {
+        try {
+          const tags = this.tagsArray
+            .filter(t => this.tags.includes(t.name))
+            .map(t => t.id);
+          this.$store.dispatch("saveNewCard", {
+            word: this.word,
+            translation: this.translation,
+            notes: this.notes,
+            tags
+          });
+          this.onReset();
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        this.$w.notify({
+          type: "warning",
+          message: `'Word and Translation field are mandatory.`
+        });
+      }
+    },
 
     onReset() {
       this.word = null;
       this.translation = null;
       this.notes = null;
       this.tags = [];
+      this.$refs.cardForm.resetValidation();
     }
   }
 };
