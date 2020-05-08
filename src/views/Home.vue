@@ -50,7 +50,7 @@ export default {
           id: 1,
           word: "home",
           translation: "hogar",
-          notes: "Where people leave",
+          notes: "Where people live",
           tags: ["building"]
         },
         {

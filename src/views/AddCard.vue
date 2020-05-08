@@ -51,33 +51,45 @@
 </template>
 
 <script>
+import store from "@/store";
+
 export default {
   name: "AddWord",
+  async beforeRouteEnter(routeTo, routeFrom, next) {
+    await store.dispatch("fetchTags");
+    next();
+  },
   data() {
     return {
       word: null,
       translation: null,
       notes: null,
-      tags: null,
-      tagOptions: ["animal", "buildings", "fruits"],
-      filteredOptions: ["animal", "buildings", "fruits"]
+      tags: [],
+      filteredOptions: []
     };
+  },
+  computed: {
+    tagsArray() {
+      return this.$store.getters.tagsArray.map(tag => tag.name);
+    }
   },
   methods: {
     tagFilter(val, update) {
-      console.log(val);
+      this.$q.notify("Message");
+
       if (val === "") {
         update(() => {
-          this.filteredOptions = this.tagOptions;
+          this.filteredOptions = this.tagsArray;
         });
         return;
       }
-
       update(() => {
-        const needle = val.toLowerCase();
-        this.filteredOptions = this.tagOptions.filter(v =>
-          v.toLowerCase().includes(needle)
-        );
+        if (this.tagsArray && this.tagsArray.length) {
+          const needle = val.toLowerCase();
+          this.filteredOptions = this.tagsArray.filter(v =>
+            v.toLowerCase().includes(needle)
+          );
+        }
       });
     },
     createTag(val, done) {
@@ -89,8 +101,8 @@ export default {
           .map(v => v.trim())
           .filter(v => v.length > 0)
           .forEach(v => {
-            if (!this.tagOptions.includes(v)) {
-              this.tagOptions.push(v);
+            if (!this.tagsArray.includes(v)) {
+              this.$store.dispatch("saveNewTag", { name: v });
             }
             if (!tags.includes(v)) {
               tags.push(v);
@@ -101,9 +113,7 @@ export default {
         this.tags = tags;
       }
     },
-    onSubmit() {
-      console.log("submit");
-    },
+    onSubmit() {},
 
     onReset() {
       this.word = null;
