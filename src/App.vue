@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="glossy">
-      <q-toolbar>
+    <q-header elevated>
+      <q-toolbar class="bg-indigo-6">
         <q-btn
           flat
           dense
@@ -42,6 +42,11 @@
           </q-item-section>
         </q-item>
       </q-list>
+      <img
+        class="chinchilla-logo"
+        src="@/assets/chinchilla.svg"
+        alt="logo_chinchilla"
+      />
     </q-drawer>
 
     <q-page-container>
@@ -75,6 +80,12 @@ export default {
           label: "Tags",
           caption: "Manage your tags",
           toRouteName: "Tags"
+        },
+        {
+          icon: "webhook",
+          label: "Resources",
+          caption: "Resources used in this app",
+          toRouteName: "Resources"
         }
       ]
     };
@@ -91,4 +102,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.chinchilla-logo {
+  bottom: 1rem;
+  position: absolute;
+}
+</style>
