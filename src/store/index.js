@@ -40,6 +40,9 @@ export default new Vuex.Store({
     },
     REMOVE_CARD(state, cardId) {
       Vue.delete(state.cards, cardId);
+    },
+    REMOVE_TAG(state, tagId) {
+      Vue.delete(state.tags, tagId);
     }
   },
   actions: {
@@ -101,6 +104,34 @@ export default new Vuex.Store({
         })
         .catch(error => {
           errorHandler("There was a problem deleting the card", error);
+        })
+        .finally(() => Loading.hide());
+    },
+    updateTag({ commit }, tag) {
+      return TagService.putTag(tag)
+        .then(() => {
+          Notify.create({
+            type: "positive",
+            message: `Tag updated.`
+          });
+          commit("SET_TAGS", [tag]);
+        })
+        .catch(error => {
+          errorHandler("There was a problem updating the tag", error);
+        });
+    },
+    deleteTag({ commit }, tagId) {
+      Loading.show();
+      return TagService.deleteTag(tagId)
+        .then(() => {
+          commit("REMOVE_TAG", tagId);
+          Notify.create({
+            type: "positive",
+            message: `Tag successfully deleted.`
+          });
+        })
+        .catch(error => {
+          errorHandler("There was a problem deleting the tag", error);
         })
         .finally(() => Loading.hide());
     }

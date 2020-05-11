@@ -6,5 +6,11 @@ export default {
   },
   postTag(tag) {
     return apiClient.post("/tags", tag);
+  },
+  putTag(tag) {
+    return apiClient.put(`/tags/${tag.id}`, tag);
+  },
+  deleteTag(tagId) {
+    return apiClient.delete(`/tags/${tagId}`);
   }
 };
