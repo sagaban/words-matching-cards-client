@@ -1,15 +1,23 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md home">
-    <transition name="fade">
-      <word-card
-        v-show="!this.isTransitioning"
-        :card="currentCard"
-        :tags="tags"
-        @changeCard="changeCard"
-        @deleteCard="deleteCard"
-        ref="wordCard"
-      />
-    </transition>
+    <div v-if="this.cardsArray.length">
+      <transition name="fade">
+        <word-card
+          v-show="!this.isTransitioning"
+          :card="currentCard"
+          :tags="tags"
+          @changeCard="changeCard"
+          @deleteCard="deleteCard"
+          ref="wordCard"
+        />
+      </transition>
+    </div>
+    <div v-else>
+      <span class="no-cards-message">
+        There is not cards.
+        <router-link :to="{ name: 'AddCard' }">Add them!</router-link>
+      </span>
+    </div>
   </div>
 </template>
 
@@ -17,10 +25,10 @@
 import store from "@/store";
 import WordCard from "@/components/WordCard";
 
-const DIRECTIONS = {
-  RIGHT: "right",
-  LEFT: "left"
-};
+// const DIRECTIONS = {
+//   RIGHT: "right",
+//   LEFT: "left"
+// };
 
 export default {
   name: "Home",
@@ -42,7 +50,11 @@ export default {
   },
   computed: {
     currentCard() {
-      return this.cardsArray[this.currentIndex];
+      if (this.currentIndex < this.cardsArray.length) {
+        return this.cardsArray[this.currentIndex];
+      } else {
+        return this.cardsArray[0];
+      }
     },
     cardsArray() {
       return this.$store.getters.cardsArray;
@@ -52,17 +64,19 @@ export default {
     }
   },
   methods: {
-    changeCard(direction) {
+    changeCard(/* direction */) {
       this.isTransitioning = true;
+      this.$refs.wordCard.changeCardSide(true);
       const vm = this;
       setTimeout(function() {
-        if (direction === DIRECTIONS.RIGHT) {
-          vm.currentIndex =
-            vm.currentIndex === 0
-              ? vm.cardsArray.length - 1
-              : vm.currentIndex - 1;
+        if (vm.cardsArray.length > 0) {
+          let newIndex = vm.currentIndex;
+          while (newIndex === vm.currentIndex) {
+            newIndex = Math.round(Math.random() * (vm.cardsArray.length - 1));
+          }
+          vm.currentIndex = newIndex;
         } else {
-          vm.currentIndex = (vm.currentIndex + 1) % vm.cardsArray.length;
+          vm.currentIndex = 0;
         }
         vm.isTransitioning = false;
       }, 300);
@@ -76,10 +90,7 @@ export default {
           persistent: true
         })
         .onOk(() => {
-          this.$refs.wordCard.changeCardSide();
-          if (this.currentIndex === this.cardsArray.length - 1) {
-            this.currentIndex = this.currentIndex - 1;
-          }
+          this.changeCard();
           this.$store.dispatch("deleteCard", cardId);
         });
     }
@@ -90,6 +101,18 @@ export default {
 <style lang="scss" scoped>
 .home {
   justify-content: space-evenly;
+
+  .no-cards-message {
+    margin: 2rem 1rem;
+    font-size: 2rem;
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+      text-decoration: none;
+      color: #3f51b5;
+    }
+  }
 }
 
 .fade-enter-active,

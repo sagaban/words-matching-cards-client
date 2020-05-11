@@ -64,8 +64,8 @@ export default {
     deleteCard(cardId) {
       this.$emit("deleteCard", cardId);
     },
-    changeCardSide() {
-      this.isFrontSide = true;
+    changeCardSide(toFrontSide) {
+      this.isFrontSide = toFrontSide;
     }
   }
 };

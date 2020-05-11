@@ -130,6 +130,7 @@ export default {
     },
     addTagButtonHandler() {
       this.createTag(this.$refs.tagSelectInput.inputValue);
+      this.$refs.tagSelectInput.inputValue = "";
     },
     async onSubmit() {
       if (this.word && this.translation) {
