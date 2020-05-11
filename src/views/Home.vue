@@ -7,6 +7,7 @@
         :tags="tags"
         @changeCard="changeCard"
         @deleteCard="deleteCard"
+        ref="wordCard"
       />
     </transition>
   </div>
@@ -75,8 +76,11 @@ export default {
           persistent: true
         })
         .onOk(() => {
+          this.$refs.wordCard.changeCardSide();
+          if (this.currentIndex === this.cardsArray.length - 1) {
+            this.currentIndex = this.currentIndex - 1;
+          }
           this.$store.dispatch("deleteCard", cardId);
-          this.isFrontSide = true;
         });
     }
   }

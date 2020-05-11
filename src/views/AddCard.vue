@@ -39,7 +39,12 @@
         v-model="tags"
         :options="filteredOptions"
         label="Tags"
-      />
+        ref="tagSelectInput"
+      >
+        <template v-slot:append v-if="showAddTagButton">
+          <q-btn round dense flat icon="add" @click="addTagButtonHandler" />
+        </template>
+      </q-select>
 
       <div>
         <q-btn label="Submit" type="submit" color="primary" />
@@ -70,7 +75,8 @@ export default {
       translation: null,
       notes: null,
       tags: [],
-      filteredOptions: []
+      filteredOptions: [],
+      showAddTagButton: false
     };
   },
   computed: {
@@ -84,11 +90,15 @@ export default {
   methods: {
     tagFilter(val, update) {
       if (val === "") {
+        this.showAddTagButton = false;
+
         update(() => {
           this.filteredOptions = this.tagsStringArray;
         });
         return;
       }
+      this.showAddTagButton = true;
+
       update(() => {
         if (this.tagsStringArray && this.tagsStringArray.length) {
           const needle = val.toLowerCase();
@@ -98,10 +108,9 @@ export default {
         }
       });
     },
-    createTag(val, done) {
+    createTag(val, done = () => {}) {
       if (val.length > 0) {
         const tags = (this.tags || []).slice();
-
         val
           .split(/[,;|]+/)
           .map(v => v.trim())
@@ -118,6 +127,9 @@ export default {
         done(tags);
         this.tags = tags;
       }
+    },
+    addTagButtonHandler() {
+      this.createTag(this.$refs.tagSelectInput.inputValue);
     },
     async onSubmit() {
       if (this.word && this.translation) {
