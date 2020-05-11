@@ -37,6 +37,9 @@ export default new Vuex.Store({
     },
     SET_CARDS(state, cards) {
       cards.forEach(card => Vue.set(state.cards, card.id, card));
+    },
+    REMOVE_CARD(state, cardId) {
+      Vue.delete(state.cards, cardId);
     }
   },
   actions: {
@@ -83,6 +86,21 @@ export default new Vuex.Store({
         })
         .catch(error => {
           errorHandler("There was a problem saving new card", error);
+        })
+        .finally(() => Loading.hide());
+    },
+    deleteCard({ commit }, cardId) {
+      Loading.show();
+      return CardService.deleteCard(cardId)
+        .then(() => {
+          commit("REMOVE_CARD", cardId);
+          Notify.create({
+            type: "positive",
+            message: `Card successfully deleted.`
+          });
+        })
+        .catch(error => {
+          errorHandler("There was a problem deleting the card", error);
         })
         .finally(() => Loading.hide());
     }

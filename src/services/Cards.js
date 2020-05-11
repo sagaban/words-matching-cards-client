@@ -6,5 +6,8 @@ export default {
   },
   postCard(card) {
     return apiClient.post("/cards", card);
+  },
+  deleteCard(cardId) {
+    return apiClient.delete(`/cards/${cardId}`);
   }
 };
