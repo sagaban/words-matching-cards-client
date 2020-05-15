@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md home">
-    <div v-if="this.cardsArray.length">
+    <div class="card-container" v-if="this.cardsArray.length">
       <transition name="fade">
         <word-card
           v-show="!this.isTransitioning"
@@ -101,7 +101,9 @@ export default {
 <style lang="scss" scoped>
 .home {
   justify-content: space-evenly;
-
+  .card-container {
+    max-width: 100%;
+  }
   .no-cards-message {
     margin: 2rem 1rem;
     font-size: 2rem;

@@ -8,7 +8,7 @@
     <div class="card__inner">
       <q-card class="card__side card__front">
         <q-card-section>
-          <h2>{{ card.word }}</h2>
+          {{ card.word }}
         </q-card-section>
       </q-card>
       <q-card class="card__side card__back">
@@ -83,6 +83,8 @@ export default {
   width: 30rem;
   height: 20rem;
   user-select: none;
+  max-width: 100%;
+  font-size: 2.5rem;
 
   &__inner {
     position: relative;
