@@ -13,9 +13,6 @@
       </q-card>
       <q-card class="card__side card__back">
         <q-card-section>
-          <div class="card__back__delete" @click.stop="deleteCard(card.id)">
-            <q-icon name="delete" />
-          </div>
           <div class="card__back__word">{{ card.word }}:</div>
           <div class="card__back__translation">
             {{ card.translation }}
@@ -60,9 +57,6 @@ export default {
     handleSwipe({ direction }) {
       this.changeCardSide();
       this.$emit("changeCard", direction);
-    },
-    deleteCard(cardId) {
-      this.$emit("deleteCard", cardId);
     },
     changeCardSide(toFrontSide) {
       this.isFrontSide = toFrontSide;
@@ -146,6 +140,10 @@ export default {
     }
     &__notes-label {
       font-weight: bold;
+      font-size: 1rem;
+    }
+    &__notes {
+      font-size: 1rem;
     }
     &__tags {
       position: absolute;

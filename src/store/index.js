@@ -77,6 +77,17 @@ export default new Vuex.Store({
         })
         .finally(() => Loading.hide());
     },
+    fetchCard({ commit }, cardId) {
+      Loading.show();
+      return CardService.getCard(cardId)
+        .then(response => {
+          commit("SET_CARDS", [response.data]);
+        })
+        .catch(error => {
+          errorHandler("There was a problem fetching a card", error);
+        })
+        .finally(() => Loading.hide());
+    },
     saveNewCard({ commit }, newCard) {
       Loading.show();
       return CardService.postCard(newCard)
@@ -85,6 +96,21 @@ export default new Vuex.Store({
           Notify.create({
             type: "positive",
             message: `Card successfully created.`
+          });
+        })
+        .catch(error => {
+          errorHandler("There was a problem saving new card", error);
+        })
+        .finally(() => Loading.hide());
+    },
+    updateCard({ commit }, card) {
+      Loading.show();
+      return CardService.putCard(card)
+        .then(() => {
+          commit("SET_CARDS", [card]);
+          Notify.create({
+            type: "positive",
+            message: `Card successfully updated.`
           });
         })
         .catch(error => {

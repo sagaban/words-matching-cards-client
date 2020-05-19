@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md add-card">
-    <h4>Add a new card</h4>
-    <card-form :tags-object="tags" @submit="onSubmit" />
+    <h4>Edit an existing card</h4>
+    <card-form :tags-object="tags" :card="card" @submit="onSubmit" />
   </div>
 </template>
 
@@ -14,18 +14,33 @@ export default {
   components: {
     CardForm
   },
+  props: {
+    id: {
+      type: Number,
+      required: true
+    }
+  },
   async beforeRouteEnter(routeTo, routeFrom, next) {
     await store.dispatch("fetchTags");
+    await store.dispatch("fetchCard", routeTo.params.id);
     next();
   },
   computed: {
     tags() {
       return this.$store.state.tags;
+    },
+    card() {
+      return this.$store.state.cards[this.id];
     }
   },
   methods: {
-    onSubmit(card) {
-      this.$store.dispatch("saveNewCard", card);
+    async onSubmit(card) {
+      try {
+        await this.$store.dispatch("updateCard", card);
+        window.history.back();
+      } catch (error) {
+        console.error("There was an error ");
+      }
     }
   }
 };

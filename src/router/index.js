@@ -11,7 +11,7 @@ const routes = [
     component: Home
   },
   {
-    path: "/add-card",
+    path: "/card",
     name: "AddCard",
     // route level code-splitting
     // this generates a separate chunk (add-card.[hash].js) for this route
@@ -20,16 +20,29 @@ const routes = [
       import(/* webpackChunkName: "add-card" */ "../views/AddCard.vue")
   },
   {
+    path: "/card/:id",
+    name: "EditCard",
+    props: true,
+    component: () =>
+      import(/* webpackChunkName: "add-card" */ "../views/EditCard.vue")
+  },
+  {
     path: "/tags",
     name: "Tags",
     component: () =>
       import(/* webpackChunkName: "add-card" */ "../views/Tags.vue")
   },
   {
-    path: "/Resources",
+    path: "/resources",
     name: "Resources",
     component: () =>
       import(/* webpackChunkName: "resources" */ "../views/Resources.vue")
+  },
+  {
+    path: "/words-list",
+    name: "WordsList",
+    component: () =>
+      import(/* webpackChunkName: "words-list" */ "../views/WordsList.vue")
   }
 ];
 

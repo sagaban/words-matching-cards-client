@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Learning words
+          {{ title }}
         </q-toolbar-title>
 
         <div>Para patatina</div>
@@ -64,22 +64,28 @@ export default {
       leftDrawerOpen: false,
       navigationItems: [
         {
-          icon: "school",
+          icon: "home",
           label: "Home",
           caption: "Cards List",
           toRouteName: "Home"
         },
         {
-          icon: "code",
+          icon: "add",
           label: "AddCard",
           caption: "Add more cards",
           toRouteName: "AddCard"
         },
         {
-          icon: "chat",
+          icon: "label",
           label: "Tags",
           caption: "Manage your tags",
           toRouteName: "Tags"
+        },
+        {
+          icon: "format_align_left",
+          label: "Words List",
+          caption: "All stored words as a list",
+          toRouteName: "WordsList"
         },
         {
           icon: "webhook",
@@ -89,6 +95,13 @@ export default {
         }
       ]
     };
+  },
+  computed: {
+    title() {
+      return this.$route.name
+        ? this.$route.name.replace(/([A-Z])/g, " $1").trim()
+        : "Word cards";
+    }
   },
   methods: {
     navigateTo(routeName) {
