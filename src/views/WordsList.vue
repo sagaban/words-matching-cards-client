@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     editCard(cardId) {
-      this.$router.push({ name: "EditCard", params: { id: cardId } });
+      this.$router.push({ name: "EditCard", params: { id: `${cardId}` } });
     },
     deleteCard(cardId) {
       this.$q

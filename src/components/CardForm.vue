@@ -21,6 +21,8 @@
     />
     <q-input filled v-model="notes" type="textarea" label="Notes" lazy-rules />
 
+    <q-toggle v-model="learned" label="Have I learned this word?" left-label />
+
     <q-select
       use-input
       input-debounce="0"
@@ -40,7 +42,14 @@
 
     <div>
       <q-btn label="Submit" type="submit" color="primary" />
-      <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+      <q-btn
+        v-if="!card"
+        label="Reset"
+        type="reset"
+        color="primary"
+        flat
+        class="q-ml-sm"
+      />
     </div>
   </q-form>
 </template>
@@ -65,6 +74,7 @@ export default {
       word: null,
       translation: null,
       notes: null,
+      learned: null,
       tags: [],
       filteredOptions: [],
       showAddTagButton: false
@@ -75,6 +85,7 @@ export default {
       this.word = this.card.word;
       this.translation = this.card.translation;
       this.notes = this.card.notes;
+      this.learned = this.card.learned;
       this.tags = this.card.tags.map(t => this.tagsObject[t.id].name);
     }
   },

@@ -1,5 +1,9 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md home">
+    <card-filters-panel
+      :showLearnedWords="showLearnedWords"
+      @toggleLearned="toggleLearned"
+    />
     <div class="card-container" v-if="this.cardsArray.length">
       <transition name="fade">
         <word-card
@@ -24,6 +28,7 @@
 <script>
 import store from "@/store";
 import WordCard from "@/components/WordCard";
+import CardFiltersPanel from "@/components/CardFiltersPanel";
 
 // const DIRECTIONS = {
 //   RIGHT: "right",
@@ -40,12 +45,14 @@ export default {
     next();
   },
   components: {
-    WordCard
+    WordCard,
+    CardFiltersPanel
   },
   data() {
     return {
       currentIndex: 0,
-      isTransitioning: false
+      isTransitioning: false,
+      showLearnedWords: true
     };
   },
   computed: {
@@ -57,7 +64,10 @@ export default {
       }
     },
     cardsArray() {
-      return this.$store.getters.cardsArray;
+      const { showLearnedWords } = this;
+      return this.$store.getters.cardsArray.filter(
+        card => showLearnedWords || !card.learned
+      );
     },
     tags() {
       return this.$store.state.tags;
@@ -93,6 +103,9 @@ export default {
           this.changeCard();
           this.$store.dispatch("deleteCard", cardId);
         });
+    },
+    toggleLearned() {
+      this.showLearnedWords = !this.showLearnedWords;
     }
   }
 };

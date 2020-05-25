@@ -8,11 +8,25 @@
     <div class="card__inner">
       <q-card class="card__side card__front">
         <q-card-section>
+          <q-checkbox
+            class="card__front__learned"
+            left-label
+            :value="card.learned"
+            label="Learned"
+            @input="toggleLearnedCard(card)"
+          />
+
           {{ card.word }}
         </q-card-section>
       </q-card>
       <q-card class="card__side card__back">
         <q-card-section>
+          <div class="card__back__edit" @click.stop="editCard(card.id)">
+            <q-icon name="edit" />
+          </div>
+          <div class="card__back__delete" @click.stop="deleteCard(card.id)">
+            <q-icon name="delete" />
+          </div>
           <div class="card__back__word">{{ card.word }}:</div>
           <div class="card__back__translation">
             {{ card.translation }}
@@ -60,6 +74,20 @@ export default {
     },
     changeCardSide(toFrontSide) {
       this.isFrontSide = toFrontSide;
+    },
+    deleteCard(cardId) {
+      this.$emit("deleteCard", cardId);
+    },
+    editCard(cardId) {
+      this.$router.push({ name: "EditCard", params: { id: `${cardId}` } });
+    },
+    async toggleLearnedCard(card) {
+      try {
+        const updatedCard = { ...card, learned: !card.learned };
+        await this.$store.dispatch("updateCard", updatedCard);
+      } catch (error) {
+        console.error("There was an error ");
+      }
     }
   }
 };
@@ -101,6 +129,13 @@ export default {
 
   /* Style the front side (fallback if image is missing) */
   &__front {
+    &__learned {
+      position: absolute;
+      right: 0.5rem;
+      top: 0.25rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
     background-color: #7986cb;
     color: black;
     .q-card__section {
@@ -125,8 +160,16 @@ export default {
     &__delete {
       position: absolute;
       right: 1rem;
-      font-size: 2rem;
+      font-size: 1.75rem;
       color: #ef5350;
+      top: 0.5rem;
+      cursor: pointer;
+    }
+    &__edit {
+      position: absolute;
+      right: 3rem;
+      font-size: 1.75rem;
+      color: #7986cb;
       top: 0.5rem;
       cursor: pointer;
     }
