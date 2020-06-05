@@ -5,12 +5,24 @@ const apiClient = axios.create({
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/api"
       : "/api",
-  withCredentials: false, // This is the default
+  withCredentials: true, // Send cookies
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json"
   },
   timeout: 10000
 });
+
+apiClient.interceptors.response.use(
+  function(response) {
+    return response;
+  },
+  function(error) {
+    if (error.response.status === 401) {
+      window.location = "/";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;

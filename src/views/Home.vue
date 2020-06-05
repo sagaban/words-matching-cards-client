@@ -1,111 +1,52 @@
 <template>
-  <div class="q-pa-md row items-start q-gutter-md home">
-    <card-filters-panel
-      :showLearnedWords="showLearnedWords"
-      @toggleLearned="toggleLearned"
+  <div class="home">
+    <h1 class="home__title">Word cards</h1>
+    <img
+      class="home__chinchilla-logo"
+      src="@/assets/chinchilla.svg"
+      alt="logo_chinchilla"
     />
-    <div class="card-container" v-if="this.cardsArray.length">
-      <transition name="fade">
-        <word-card
-          v-show="!this.isTransitioning"
-          :card="currentCard"
-          :tags="tags"
-          @changeCard="changeCard"
-          @deleteCard="deleteCard"
-          ref="wordCard"
-        />
-      </transition>
-    </div>
-    <div v-else>
-      <span class="no-cards-message">
-        There is not cards.
-        <router-link :to="{ name: 'AddCard' }">Add them!</router-link>
-      </span>
-    </div>
+    <a href="/auth/google" class="home__google-login-link login-link">
+      <q-btn
+        class="home__login-button"
+        color="primary"
+        icon="mail"
+        label="Login with Google"
+      />
+    </a>
+    <a
+      v-if="showNoopLogin"
+      href="#"
+      @click="noopLogin"
+      class="home__noop-login-link login-link"
+    >
+      <q-btn
+        class="home__login-button"
+        color="primary"
+        icon="account_box"
+        label="Noop login"
+      />
+    </a>
   </div>
 </template>
 
 <script>
-import store from "@/store";
-import WordCard from "@/components/WordCard";
-import CardFiltersPanel from "@/components/CardFiltersPanel";
-
-// const DIRECTIONS = {
-//   RIGHT: "right",
-//   LEFT: "left"
-// };
-
 export default {
   name: "Home",
-  async beforeRouteEnter(routeTo, routeFrom, next) {
-    await Promise.all([
-      store.dispatch("fetchTags"),
-      store.dispatch("fetchCards")
-    ]);
-    next();
-  },
-  components: {
-    WordCard,
-    CardFiltersPanel
-  },
-  data() {
-    return {
-      currentIndex: 0,
-      isTransitioning: false,
-      showLearnedWords: true
-    };
+  beforeCreate() {
+    if (this.$store.getters.isLoggedIn) {
+      this.$router.push({ name: "Cards" });
+    }
   },
   computed: {
-    currentCard() {
-      if (this.currentIndex < this.cardsArray.length) {
-        return this.cardsArray[this.currentIndex];
-      } else {
-        return this.cardsArray[0];
-      }
-    },
-    cardsArray() {
-      const { showLearnedWords } = this;
-      return this.$store.getters.cardsArray.filter(
-        card => showLearnedWords || !card.learned
-      );
-    },
-    tags() {
-      return this.$store.state.tags;
+    showNoopLogin() {
+      return process.env.NODE_ENV === "development";
     }
   },
   methods: {
-    changeCard(/* direction */) {
-      this.isTransitioning = true;
-      this.$refs.wordCard.changeCardSide(true);
-      const vm = this;
-      setTimeout(function() {
-        if (vm.cardsArray.length > 0) {
-          let newIndex = vm.currentIndex;
-          while (newIndex === vm.currentIndex) {
-            newIndex = Math.round(Math.random() * (vm.cardsArray.length - 1));
-          }
-          vm.currentIndex = newIndex;
-        } else {
-          vm.currentIndex = 0;
-        }
-        vm.isTransitioning = false;
-      }, 300);
-    },
-    deleteCard(cardId) {
-      this.$q
-        .dialog({
-          title: "Delete",
-          message: "Are you sure you want to delete this card?",
-          cancel: true,
-          persistent: true
-        })
-        .onOk(() => {
-          this.changeCard();
-          this.$store.dispatch("deleteCard", cardId);
-        });
-    },
-    toggleLearned() {
-      this.showLearnedWords = !this.showLearnedWords;
+    async noopLogin() {
+      await this.$store.dispatch("noopLogin");
+      this.$router.push({ name: "Cards" });
     }
   }
 };
@@ -113,28 +54,29 @@ export default {
 
 <style lang="scss" scoped>
 .home {
+  margin: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
   justify-content: space-evenly;
-  .card-container {
-    max-width: 100%;
-  }
-  .no-cards-message {
-    margin: 2rem 1rem;
-    font-size: 2rem;
-    a:link,
-    a:visited,
-    a:hover,
-    a:active {
-      text-decoration: none;
-      color: #3f51b5;
-    }
-  }
-}
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+  &__title {
+    font-size: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__chinchilla-logo {
+    max-height: 70vh;
+    margin: 0 2rem 2rem 2rem;
+  }
+
+  .login-link {
+    margin: 0.5rem auto;
+  }
+
+  &__login-button {
+    min-width: 15rem;
+  }
 }
 </style>

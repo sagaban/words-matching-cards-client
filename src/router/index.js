@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import store from "@/store";
 
 Vue.use(VueRouter);
 
@@ -11,7 +12,13 @@ const routes = [
     component: Home
   },
   {
-    path: "/card",
+    path: "/cards",
+    name: "Cards",
+    component: () =>
+      import(/* webpackChunkName: "cards" */ "../views/Cards.vue")
+  },
+  {
+    path: "/cards/new",
     name: "AddCard",
     // route level code-splitting
     // this generates a separate chunk (add-card.[hash].js) for this route
@@ -20,7 +27,7 @@ const routes = [
       import(/* webpackChunkName: "add-card" */ "../views/AddCard.vue")
   },
   {
-    path: "/card/:id",
+    path: "/cards/:id",
     name: "EditCard",
     props: true,
     component: () =>
@@ -50,6 +57,17 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  const { isLoggedIn } = store.getters;
+  if (!isLoggedIn) {
+    //try to get the user from the stored cookie
+    store.dispatch("getStoredUser");
+  }
+  if (to.name !== "Home" && !isLoggedIn) next({ name: "Home" });
+  else if (to.name === "Home" && isLoggedIn) next({ name: "Cards" });
+  else next();
 });
 
 export default router;

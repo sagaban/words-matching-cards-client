@@ -3,6 +3,8 @@ import Vuex from "vuex";
 import TagService from "@/services/Tags";
 import CardService from "@/services/Cards";
 import { Notify, Loading } from "quasar";
+import { JET_KEY_NAME } from "@/utils/constants";
+import axios from "axios";
 
 Vue.use(Vuex);
 
@@ -29,7 +31,8 @@ const errorHandler = (baseErrorMsg, error) => {
 export default new Vuex.Store({
   state: {
     tags: {},
-    cards: {}
+    cards: {},
+    user: null
   },
   mutations: {
     SET_TAGS(state, tags) {
@@ -43,6 +46,12 @@ export default new Vuex.Store({
     },
     REMOVE_TAG(state, tagId) {
       Vue.delete(state.tags, tagId);
+    },
+    SET_USER(state, user) {
+      state.user = user;
+    },
+    REMOVE_USER(state) {
+      state.user = null;
     }
   },
   actions: {
@@ -160,6 +169,26 @@ export default new Vuex.Store({
           errorHandler("There was a problem deleting the tag", error);
         })
         .finally(() => Loading.hide());
+    },
+    async noopLogin({ dispatch }) {
+      try {
+        const response = await axios.get("http://localhost:3000/auth/noop");
+        Vue.$cookies.set(JET_KEY_NAME, response.data);
+        dispatch("getStoredUser");
+        return true;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    getStoredUser({ commit }) {
+      const payload = Vue.$jwt.decode();
+      if (payload) {
+        commit("SET_USER", payload.data);
+      }
+    },
+    logOut({ commit }) {
+      Vue.$cookies.remove(JET_KEY_NAME);
+      commit("REMOVE_USER");
     }
   },
   getters: {
@@ -168,6 +197,9 @@ export default new Vuex.Store({
     },
     cardsArray: state => {
       return Object.keys(state.cards).map(key => state.cards[key]);
+    },
+    isLoggedIn: state => {
+      return !!state.user;
     }
   }
 });
